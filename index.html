@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ YEAR 3 SURVIVAL CELEBRATION ⚡</title>
+    <style>
+        :root {
+            --neon-pink: #ff007f;
+            --neon-blue: #00f0ff;
+            --neon-green: #39ff14;
+            --dark-bg: #0d0e15;
+            --card-bg: #181a26;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            transition: background 1s ease;
+        }
+
+        /* Matrix Canvas */
+        #matrix-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 2s ease;
+            pointer-events: none;
+        }
+
+        /* Particles Canvas */
+        #canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 999;
+        }
+
+        /* Content wrapper to stay above background canvas */
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Glitchy Neon Header */
+        .header-container {
+            text-align: center;
+            padding: 60px 20px 30px 20px;
+            position: relative;
+            width: 100%;
+            background: radial-gradient(circle at center, #1e1233 0%, var(--dark-bg) 70%);
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin: 0;
+            text-transform: uppercase;
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue), 0 0 40px var(--neon-blue);
+            letter-spacing: 4px;
+        }
+
+        .core-statement {
+            background: rgba(255, 0, 127, 0.1);
+            border: 2px solid var(--neon-pink);
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+            max-width: 650px;
+            margin: 25px auto;
+            padding: 20px;
+            border-radius: 50px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 5px var(--neon-pink);
+        }
+
+        /* Interactive "Stress Meter" Game */
+        .interactive-widget {
+            background: var(--card-bg);
+            border: 1px solid #2a2e45;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            padding: 25px;
+            margin-bottom: 40px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .meter-container {
+            background: #000;
+            border-radius: 20px;
+            height: 25px;
+            width: 100%;
+            margin: 15px 0;
+            overflow: hidden;
+            border: 1px solid var(--neon-blue);
+        }
+
+        .meter-bar {
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+            width: 100%;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .action-btn {
+            background: transparent;
+            color: var(--neon-green);
+            border: 2px solid var(--neon-green);
+            box-shadow: 0 0 8px rgba(57, 255, 20, 0.3);
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+
+        .action-btn:hover {
+            background: var(--neon-green);
+            color: #000;
+            box-shadow: 0 0 20px var(--neon-green);
+        }
+
+        /* Timeline Cards */
+        .timeline-section {
+            max-width: 700px;
+            width: 90%;
+            margin-bottom: 60px;
+        }
+
+        .timeline-title {
+            text-align: center;
+            font-size: 1.6rem;
+            color: var(--neon-blue);
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .itinerary-card {
+            background: var(--card-bg);
+            border: 1px solid #222536;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .itinerary-card:hover {
+            border-color: var(--neon-blue);
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+        }
+
+        /* Click rumble effect */
+        .rumble {
+            animation: shake 0.15s linear 2;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(2px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(0px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(2px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(2px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        .time-badge {
+            width: 25%;
+            background: #12131e;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border-right: 2px solid #222536;
+            color: var(--neon-blue);
+            padding: 15px;
+            text-align: center;
+        }
+
+        .card-body {
+            width: 75%;
+            padding: 20px;
+            text-align: left;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin: 0 0 8px 0;
+            color: #fff;
+        }
+
+        .card-desc {
+            font-size: 0.95rem;
+            color: #a0a5c0;
+            line-height: 1.5;
+        }
+
+        /* Floating Word Effect */
+        .floating-word {
+            position: fixed;
+            pointer-events: none;
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--neon-pink);
+            text-shadow: 0 0 5px var(--neon-pink);
+            z-index: 1000;
+            animation: floatUp 1s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-120px) scale(0.8); opacity: 0; }
+        }
+
+        /* The Runaway Friend Button Section */
+        .friend-checker {
+            background: #1b1322;
+            border: 1px dashed var(--neon-pink);
+            border-radius: 10px;
+            padding: 25px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+            min-height: 150px;
+        }
+
+        .choice-btn {
+            padding: 10px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            border: none;
+        }
+
+        .yes-btn { background-color: var(--neon-blue); color: #000; }
+        .no-btn { background-color: #331424; color: var(--neon-pink); border: 1px solid var(--neon-pink); }
+
+        /* Footer */
+        footer {
+            background: #08090d;
+            width: 100%;
+            text-align: center;
+            padding: 25px;
+            color: #515675;
+            font-size: 0.9rem;
+            border-top: 1px solid #1c1e2d;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="matrix-canvas"></canvas>
+    <canvas id="canvas"></canvas>
+
+    <div class="content-wrapper">
+        <div class="header-container">
+            <h1>🔓 YEAR 3 ESCAPE ROOM 🔓</h1>
+            <div class="core-statement">
+                “This day is to celebrate the end of year 3.”
+            </div>
+        </div>
+
+        <div class="interactive-widget">
+            <h3 style="margin-top:0;">🧠 腦袋學術垃圾清空器 (Year 3 Brain Purge)</h3>
+            <p style="color: #a0a5c0; font-size: 0.9rem;">瘋狂點擊下面按鈕，把 Year 3 塞進你腦袋的 Project、Assignment、考試垃圾通通格式化！</p>
+            <div class="meter-container">
+                <div class="meter-bar" id="stress-bar"></div>
+            </div>
+            <div id="meter-status" style="font-weight: bold; color: var(--neon-blue); margin-bottom: 10px;">目前殘留學術壓力：100%</div>
+            <button class="action-btn" onclick="reduceStress(event)">⚡ 釋放壓力壓榨大腦 ⚡</button>
+        </div>
+
+        <div class="timeline-section">
+            <div class="timeline-title">🔥 毀滅吧 Year 3！全日報復行程表 🔥</div>
+
+            <div class="itinerary-card" onclick="handleCardClick(this, event)">
+                <div class="time-badge"><span>09:30</span><span>↓</span><span>12:00</span></div>
+                <div class="card-body">
+                    <div class="card-title">🏊‍♂️ 洗滌身靈跳水儀式 (Morning Swim)</div>
+                    <div class="card-desc">直接跳入泳池！把過去一年所有通宵趕 Deadline 的怨氣和毒素全部洗掉。如果可以，試圖在水底忘掉所有 Professor 的名字。</div>
+                </div>
+            </div>
+
+            <div class="itinerary-card" onclick="handleCardClick(this, event)">
+                <div class="time-badge"><span>12:30</span><span>↓</span><span>14:30</span></div>
+                <div class="card-body">
+                    <div class="card-title">🍣 壽司朗無情摧毀 (Sushiro Smash)</div>
+                    <div class="card-desc">午餐時間！用吃壽司的速度來報復社會。瘋狂點擊屏幕叫甜蝦和吞拿魚，目標是把盤子疊到天花板，用實力證明：沒有任何 Project 能阻擋我乾飯！</div>
+                </div>
+            </div>
+
+            <div class="itinerary-card" onclick="handleCardClick(this, event)">
+                <div class="time-badge"><span>15:00</span><span>↓</span><span>17:30</span></div>
+                <div class="card-body">
+                    <div class="card-title">🎡 摩天輪上看開一切 (Observation Wheel)</div>
+                    <div class="card-desc">坐上摩天輪。當車廂緩緩升到中環最高點時，俯瞰整個香港，對著維港深呼吸，心裡默念：Year 3 我都活下來了，這世界上還有什麼能難倒我？</div>
+                </div>
+            </div>
+
+            <div class="itinerary-card" onclick="handleCardClick(this, event)">
+                <div class="time-badge"><span>18:30</span><span>↓</span><span>21:30</span></div>
+                <div class="card-body">
+                    <div class="card-title">🥩 終極暴食 Buffet (Grand Buffet)</div>
+                    <div class="card-desc">晚餐不跟它客氣，生蠔、長腳蟹、甜品全方位進攻。這不是普通的晚餐，這是一場慶祝我們「大難不死，必有後福」的慶功宴！</div>
+                </div>
+            </div>
+
+            <div class="itinerary-card" onclick="handleCardClick(this, event)">
+                <div class="time-badge"><span>22:00</span><span>明早</span></div>
+                <div class="card-body">
+                    <div class="card-title">💤 功德圓滿・光榮冬眠 (Deep Sleep Mode)</div>
+                    <div class="card-desc">回家把鬧鐘全部關掉！正式進入無憂無慮的「冬眠模式」。今晚沒有 Final、沒有 Project、只有極致的睡眠！</div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="friend-checker" id="quiz-area">
+            <h3 style="margin-top:0; color: var(--neon-pink);">🔒 好友綁架檢測：明天你來不來？</h3>
+            <p style="color: #a0a5c0; font-size: 0.9rem; margin-bottom: 20px;">（提示：身為好兄弟，你應該知道要點哪一個）</p>
+            <button class="choice-btn yes-btn" onclick="confirmFriend(true)">準時出席！不見不散 🍻</button>
+            <button class="choice-btn no-btn" id="runaway-btn" onmouseover="dodgeButton()">不來，我想繼續寫Assignment 📝</button>
+        </div>
+
+        <footer>
+            ⚡ 點擊行程卡片可以爆破與發射慶祝粒子 ⚡<br>
+            GAME OVER. YEAR 3 COMPLETED. CLEAR!
+        </footer>
+    </div>
+
+    <script>
+        // --- 1. Stress Meter Clicker Game & Academic Garbage Text Popper ---
+        let stress = 100;
+        const garbageWords = ['Java Bug 🐛', 'WBS Chart 📊', 'Gantt Chart 📉', 'P-value > 0.05 ❌', 'Overfitting 🧠', 'Deadline ⏰', 'Group Project 👥', 'Statistics 📈'];
+
+        function createFloatingWord(e) {
+            const word = document.createElement('div');
+            word.className = 'floating-word';
+            word.innerText = garbageWords[Math.floor(Math.random() * garbageWords.length)];
+            
+            // Spawn close to the click position
+            word.style.left = (e.clientX || window.innerWidth / 2) + (Math.random() * 60 - 30) + 'px';
+            word.style.top = (e.clientY || window.innerHeight / 2) + (Math.random() * 40 - 20) + 'px';
+            
+            document.body.appendChild(word);
+            setTimeout(() => word.remove(), 1000);
+        }
+
+        function reduceStress(e) {
+            if (stress > 0) {
+                stress -= 20;
+                if (stress < 0) stress = 0;
+                
+                const bar = document.getElementById('stress-bar');
+                const status = document.getElementById('meter-status');
+                bar.style.width = stress + '%';
+                status.innerText = `目前殘留學術壓力：${stress}%`;
+                
+                popParticles(e.clientX, e.clientY);
+                createFloatingWord(e);
+
+                if (stress === 0) {
+                    status.innerHTML = "🎉 🧠 DATA PURGED! 大腦重置成功！Year 3 徹底格式化！ 🎉";
+                    status.style.color = "var(--neon-green)";
+                    // Trigger Matrix Rain Effect
+                    startMatrixRain();
+                }
+            }
+        }
+
+        // --- 2. Card Interaction Handler (Rumble + Particles) ---
+        function handleCardClick(card, e) {
+            card.classList.add('rumble');
+            setTimeout(() => card.classList.remove('rumble'), 300);
+            popParticles(e.clientX, e.clientY);
+        }
+
+        // --- 3. Runaway "No" Button ---
+        function dodgeButton() {
+            const btn = document.getElementById('runaway-btn');
+            const container = document.getElementById('quiz-area');
+            
+            const maxX = container.clientWidth - btn.offsetWidth - 20;
+            const maxY = container.clientHeight - btn.offsetHeight - 40;
+            
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY) + 40;
+            
+            btn.style.position = 'absolute';
+            btn.style.left = randomX + 'px';
+            btn.style.top = randomY + 'px';
+        }
+
+        function confirmFriend(status) {
+            const area = document.getElementById('quiz-area');
+            if(status) {
+                area.innerHTML = "<h2 style='color:var(--neon-green); margin:20px 0;'>🔥 奈斯！明天帶上你空空的腦袋跟瘋狂的胃，出發！ 🔥</h2>";
+                for(let i=0; i<4; i++) {
+                    setTimeout(() => popParticles(Math.random() * window.innerWidth, Math.random() * window.innerHeight), i * 200);
+                }
+            }
+        }
+
+        // --- 4. Neon Confetti Particle Engine ---
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function popParticles(targetX, targetY) {
+            const colors = ['#ff007f', '#00f0ff', '#39ff14', '#ffff00'];
+            const x = targetX || Math.random() * canvas.width;
+            const y = targetY || Math.random() * canvas.height;
+            for (let i = 0; i < 30; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 8,
+                    vy: (Math.random() - 0.5) * 8 - 3,
+                    size: Math.random() * 5 + 3,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    alpha: 1
+                });
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, i) => {
+                p.y += p.vy;
+                p.x += p.vx;
+                p.vy += 0.1; // gravity
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                p.alpha -= 0.02;
+                if (p.alpha <= 0) particles.splice(i, 1);
+            });
+            ctx.globalAlpha = 1;
+            requestAnimationFrame(draw);
+        }
+        draw();
+
+        // --- 5. Data Science Matrix Rain Engine ---
+        const matrixCanvas = document.getElementById('matrix-canvas');
+        const mCtx = matrixCanvas.getContext('2d');
+        let matrixInterval;
+
+        function startMatrixRain() {
+            document.body.style.backgroundColor = '#020205';
+            matrixCanvas.style.opacity = '0.35'; // Subtly layered in background
+            
+            matrixCanvas.width = window.innerWidth;
+            matrixCanvas.height = window.innerHeight;
+
+            const alphabet = '01';
+            const fontSize = 16;
+            const columns = matrixCanvas.width / fontSize;
+
+            const rainDrops = [];
+            for (let x = 0; x < columns; x++) {
+                rainDrops[x] = 1;
+            }
+
+            const drawMatrix = () => {
+                mCtx.fillStyle = 'rgba(2, 2, 5, 0.05)';
+                mCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+
+                mCtx.fillStyle = '#39ff14'; // Neon green
+                mCtx.font = fontSize + 'px monospace';
+
+                for (let i = 0; i < rainDrops.length; i++) {
+                    const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+                    mCtx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+
+                    if (rainDrops[i] * fontSize > matrixCanvas.height && Math.random() > 0.975) {
+                        rainDrops[i] = 0;
+                    }
+                    rainDrops[i]++;
+                }
+            };
+
+            matrixInterval = setInterval(drawMatrix, 30);
+            
+            // Adjust matrix canvas sizes on resize dynamically
+            window.addEventListener('resize', () => {
+                matrixCanvas.width = window.innerWidth;
+                matrixCanvas.height = window.innerHeight;
+            });
+        }
+    </script>
+</body>
+</html>
