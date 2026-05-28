@@ -278,6 +278,49 @@
             border-top: 1px solid #1c1e2d;
         }
     </style>
+    
+    <!-- 👇 👇 👇 新增針對手機的CSS media query 👇 👇 👇 -->
+    <style>
+    @media (max-width: 600px) {
+      h1 {
+          font-size: 2rem;
+          letter-spacing: 1px;
+      }
+      .header-container {
+          padding: 30px 10px 20px 10px;
+      }
+      .timeline-title {
+          font-size: 1.1rem;
+      }
+      .itinerary-card {
+          flex-direction: column;
+          align-items: stretch;
+      }
+      .time-badge, .card-body {
+          width: 100%;
+          border-right: none;
+          padding: 12px 10px;
+          text-align: center;
+      }
+      .card-title {
+          font-size: 1.1rem;
+      }
+      .card-desc {
+          font-size: 0.92rem;
+      }
+      .interactive-widget,
+      .timeline-section,
+      .friend-checker {
+          max-width: 98vw;
+          width: 100%;
+          padding: 10px 3vw;
+      }
+      footer {
+          font-size: 0.8rem;
+          padding: 15px 5px;
+      }
+    }
+    </style>
 </head>
 <body>
     <audio id="bgm" src="music.mp3" autoplay loop></audio>
