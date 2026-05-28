@@ -281,6 +281,20 @@
 </head>
 <body>
     <audio id="bgm" src="music.mp3" autoplay loop></audio>
+    <script>
+  // Try to play audio as soon as the user interacts with page
+  function enableBgm() {
+    var audio = document.getElementById('bgm');
+    audio.play();
+    audio.muted = false; // In case it is muted
+    // Remove the event listeners after first play
+    document.removeEventListener('click', enableBgm);
+    document.removeEventListener('keydown', enableBgm);
+  }
+  // Listen for user gesture
+  document.addEventListener('click', enableBgm);
+  document.addEventListener('keydown', enableBgm);
+</script>
 
     <canvas id="matrix-canvas"></canvas>
     <canvas id="canvas"></canvas>
