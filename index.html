@@ -277,9 +277,27 @@
             font-size: 0.9rem;
             border-top: 1px solid #1c1e2d;
         }
+
+        /* PARTY MODE styles */
+        #party-btn {
+          transition: box-shadow 0.3s, background 0.5s;
+        }
+        #party-btn:active {
+          box-shadow:0 0 50px #00f0ff90;
+        }
+        .party-mode .itinerary-card,
+        .party-mode .interactive-widget,
+        .party-mode .header-container {
+          box-shadow:0 0 60px #0ff8,0 0 25px #39ff1480;
+          border-color: #ff007f !important;
+          animation: party-fade 1.4s infinite alternate;
+        }
+        @keyframes party-fade {
+          0% {filter:brightness(1.08) drop-shadow(0 0 4px #ff007f);}
+          100% {filter: brightness(1.20) drop-shadow(0 0 42px #00f0ff);}
+        }
     </style>
-    
-    <!-- 👇 👇 👇 新增針對手機的CSS media query 👇 👇 👇 -->
+    <!-- Responsive for phones 👇 -->
     <style>
     @media (max-width: 600px) {
       h1 {
@@ -323,28 +341,17 @@
     </style>
 </head>
 <body>
+    <!-- BACKGROUND MUSIC -->
     <audio id="bgm" src="music.mp3" autoplay loop></audio>
-    <script>
-  // Try to play audio as soon as the user interacts with page
-  function enableBgm() {
-    var audio = document.getElementById('bgm');
-    audio.play();
-    audio.muted = false; // In case it is muted
-    // Remove the event listeners after first play
-    document.removeEventListener('click', enableBgm);
-    document.removeEventListener('keydown', enableBgm);
-  }
-  // Listen for user gesture
-  document.addEventListener('click', enableBgm);
-  document.addEventListener('keydown', enableBgm);
-</script>
-
     <canvas id="matrix-canvas"></canvas>
     <canvas id="canvas"></canvas>
 
     <div class="content-wrapper">
         <div class="header-container">
             <h1>🔓 YEAR 3 ESCAPE ROOM 🔓</h1>
+            <button id="party-btn" style="margin:14px auto 0 auto;display:block;padding:11px 32px;border-radius:30px;background:linear-gradient(90deg,#ff007f,#00f0ff,#39ff14);color:#181a26;font-size:1.1rem;font-weight:bold;border:none;box-shadow:0 0 20px #39ff1440,0 0 30px #ff007f40;cursor:pointer;letter-spacing: 2px;">
+              🪩 PARTY MODE
+            </button>
             <div class="core-statement">
                 “This day is to celebrate the end of year 3.”
             </div>
@@ -402,7 +409,6 @@
                     <div class="card-desc">回家把鬧鐘全部關掉！正式進入無憂無慮的「冬眠模式」。今晚沒有 Final、沒有 Project、只有極致的睡眠！</div>
                 </div>
             </div>
-
         </div>
 
         <div class="friend-checker" id="quiz-area">
@@ -418,174 +424,218 @@
         </footer>
     </div>
 
+    <!-- JS區塊放到最最底！ -->
     <script>
-        // --- 1. Stress Meter Clicker Game & Academic Garbage Text Popper ---
-        let stress = 100;
-        const garbageWords = ['Java Bug 🐛', 'WBS Chart 📊', 'Gantt Chart 📉', 'P-value > 0.05 ❌', 'Overfitting 🧠', 'Deadline ⏰', 'Group Project 👥', 'Statistics 📈'];
+      // 1. 音樂播放啟動（瀏覽器互動）
+      function enableBgm() {
+        var audio = document.getElementById('bgm');
+        audio.play();
+        audio.muted = false; // 保證有聲
+        document.removeEventListener('click', enableBgm);
+        document.removeEventListener('keydown', enableBgm);
+      }
+      document.addEventListener('click', enableBgm);
+      document.addEventListener('keydown', enableBgm);
 
-        function createFloatingWord(e) {
-            const word = document.createElement('div');
-            word.className = 'floating-word';
-            word.innerText = garbageWords[Math.floor(Math.random() * garbageWords.length)];
-            
-            // Spawn close to the click position
-            word.style.left = (e.clientX || window.innerWidth / 2) + (Math.random() * 60 - 30) + 'px';
-            word.style.top = (e.clientY || window.innerHeight / 2) + (Math.random() * 40 - 20) + 'px';
-            
-            document.body.appendChild(word);
-            setTimeout(() => word.remove(), 1000);
+      // 2. PARTY MODE
+      let partyInterval = null;
+      let partyOn = false;
+      document.addEventListener('DOMContentLoaded',function() {
+        // 確保DOM ready再bind
+        document.getElementById('party-btn').onclick = function() {
+          partyOn = !partyOn;
+          if (partyOn) {
+              document.body.classList.add('party-mode');
+              partyRain();
+              this.innerText = "🛑 NORMAL MODE";
+          } else {
+              document.body.classList.remove('party-mode');
+              clearInterval(partyInterval);
+              document.body.style.background = "";
+              this.innerText = "🪩 PARTY MODE";
+          }
         }
+      });
+      function partyRain() {
+        const gradients = [
+          'linear-gradient(120deg,#ff007f,#00f0ff 70%,#39ff14)',
+          'linear-gradient(120deg,#39ff14 20%,#ff007f 75%,#0ff)',
+          'radial-gradient(circle at 60% 40%,#00f0ff,#ff007f 70%,#181a26 120%)',
+          'linear-gradient(90deg,#39ff14,#ff007f,#00f0ff)',
+          'radial-gradient(circle at 30% 100%,#ff007f,#39ff14 80%,#00f0ff 150%)'
+        ];
+        let i = 0;
+        partyInterval = setInterval(() => {
+          document.body.style.background = gradients[i%gradients.length];
+          i++;
+        }, 700); // 每0.7秒轉色
+      }
 
-        function reduceStress(e) {
-            if (stress > 0) {
-                stress -= 20;
-                if (stress < 0) stress = 0;
-                
-                const bar = document.getElementById('stress-bar');
-                const status = document.getElementById('meter-status');
-                bar.style.width = stress + '%';
-                status.innerText = `目前殘留學術壓力：${stress}%`;
-                
-                popParticles(e.clientX, e.clientY);
-                createFloatingWord(e);
+      // 3. 原本全部功能腳本（無更動）
+      // --- 1. Stress Meter Clicker Game & Academic Garbage Text Popper ---
+      let stress = 100;
+      const garbageWords = ['Java Bug 🐛', 'WBS Chart 📊', 'Gantt Chart 📉', 'P-value > 0.05 ❌', 'Overfitting 🧠', 'Deadline ⏰', 'Group Project 👥', 'Statistics 📈'];
 
-                if (stress === 0) {
-                    status.innerHTML = "🎉 🧠 DATA PURGED! 大腦重置成功！Year 3 徹底格式化！ 🎉";
-                    status.style.color = "var(--neon-green)";
-                    // Trigger Matrix Rain Effect
-                    startMatrixRain();
-                }
-            }
-        }
+      function createFloatingWord(e) {
+          const word = document.createElement('div');
+          word.className = 'floating-word';
+          word.innerText = garbageWords[Math.floor(Math.random() * garbageWords.length)];
+          word.style.left = (e.clientX || window.innerWidth / 2) + (Math.random() * 60 - 30) + 'px';
+          word.style.top = (e.clientY || window.innerHeight / 2) + (Math.random() * 40 - 20) + 'px';
+          document.body.appendChild(word);
+          setTimeout(() => word.remove(), 1000);
+      }
 
-        // --- 2. Card Interaction Handler (Rumble + Particles) ---
-        function handleCardClick(card, e) {
-            card.classList.add('rumble');
-            setTimeout(() => card.classList.remove('rumble'), 300);
-            popParticles(e.clientX, e.clientY);
-        }
+      function reduceStress(e) {
+          if (stress > 0) {
+              stress -= 20;
+              if (stress < 0) stress = 0;
 
-        // --- 3. Runaway "No" Button ---
-        function dodgeButton() {
-            const btn = document.getElementById('runaway-btn');
-            const container = document.getElementById('quiz-area');
-            
-            const maxX = container.clientWidth - btn.offsetWidth - 20;
-            const maxY = container.clientHeight - btn.offsetHeight - 40;
-            
-            const randomX = Math.floor(Math.random() * maxX);
-            const randomY = Math.floor(Math.random() * maxY) + 40;
-            
-            btn.style.position = 'absolute';
-            btn.style.left = randomX + 'px';
-            btn.style.top = randomY + 'px';
-        }
+              const bar = document.getElementById('stress-bar');
+              const status = document.getElementById('meter-status');
+              bar.style.width = stress + '%';
+              status.innerText = `目前殘留學術壓力：${stress}%`;
 
-        function confirmFriend(status) {
-            const area = document.getElementById('quiz-area');
-            if(status) {
-                area.innerHTML = "<h2 style='color:var(--neon-green); margin:20px 0;'>🔥 奈斯！明天帶上你空空的腦袋跟瘋狂的胃，出發！ 🔥</h2>";
-                for(let i=0; i<4; i++) {
-                    setTimeout(() => popParticles(Math.random() * window.innerWidth, Math.random() * window.innerHeight), i * 200);
-                }
-            }
-        }
+              popParticles(e.clientX, e.clientY);
+              createFloatingWord(e);
 
-        // --- 4. Neon Confetti Particle Engine ---
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
+              if (stress === 0) {
+                  status.innerHTML = "🎉 🧠 DATA PURGED! 大腦重置成功！Year 3 徹底格式化！ 🎉";
+                  status.style.color = "var(--neon-green)";
+                  // Trigger Matrix Rain Effect
+                  startMatrixRain();
+              }
+          }
+      }
 
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
+      // --- 2. Card Interaction Handler (Rumble + Particles) ---
+      function handleCardClick(card, e) {
+          card.classList.add('rumble');
+          setTimeout(() => card.classList.remove('rumble'), 300);
+          popParticles(e.clientX, e.clientY);
+      }
 
-        function popParticles(targetX, targetY) {
-            const colors = ['#ff007f', '#00f0ff', '#39ff14', '#ffff00'];
-            const x = targetX || Math.random() * canvas.width;
-            const y = targetY || Math.random() * canvas.height;
-            for (let i = 0; i < 30; i++) {
-                particles.push({
-                    x: x,
-                    y: y,
-                    vx: (Math.random() - 0.5) * 8,
-                    vy: (Math.random() - 0.5) * 8 - 3,
-                    size: Math.random() * 5 + 3,
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    alpha: 1
-                });
-            }
-        }
+      // --- 3. Runaway "No" Button ---
+      function dodgeButton() {
+          const btn = document.getElementById('runaway-btn');
+          const container = document.getElementById('quiz-area');
 
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach((p, i) => {
-                p.y += p.vy;
-                p.x += p.vx;
-                p.vy += 0.1; // gravity
-                ctx.globalAlpha = p.alpha;
-                ctx.fillStyle = p.color;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fill();
-                p.alpha -= 0.02;
-                if (p.alpha <= 0) particles.splice(i, 1);
-            });
-            ctx.globalAlpha = 1;
-            requestAnimationFrame(draw);
-        }
-        draw();
+          const maxX = container.clientWidth - btn.offsetWidth - 20;
+          const maxY = container.clientHeight - btn.offsetHeight - 40;
 
-        // --- 5. Data Science Matrix Rain Engine ---
-        const matrixCanvas = document.getElementById('matrix-canvas');
-        const mCtx = matrixCanvas.getContext('2d');
-        let matrixInterval;
+          const randomX = Math.floor(Math.random() * maxX);
+          const randomY = Math.floor(Math.random() * maxY) + 40;
 
-        function startMatrixRain() {
-            document.body.style.backgroundColor = '#020205';
-            matrixCanvas.style.opacity = '0.35'; // Subtly layered in background
-            
-            matrixCanvas.width = window.innerWidth;
-            matrixCanvas.height = window.innerHeight;
+          btn.style.position = 'absolute';
+          btn.style.left = randomX + 'px';
+          btn.style.top = randomY + 'px';
+      }
 
-            const alphabet = '01';
-            const fontSize = 16;
-            const columns = matrixCanvas.width / fontSize;
+      function confirmFriend(status) {
+          const area = document.getElementById('quiz-area');
+          if(status) {
+              area.innerHTML = "<h2 style='color:var(--neon-green); margin:20px 0;'>🔥 奈斯！明天帶上你空空的腦袋跟瘋狂的胃，出發！ 🔥</h2>";
+              for(let i=0; i<4; i++) {
+                  setTimeout(() => popParticles(Math.random() * window.innerWidth, Math.random() * window.innerHeight), i * 200);
+              }
+          }
+      }
 
-            const rainDrops = [];
-            for (let x = 0; x < columns; x++) {
-                rainDrops[x] = 1;
-            }
+      // --- 4. Neon Confetti Particle Engine ---
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
 
-            const drawMatrix = () => {
-                mCtx.fillStyle = 'rgba(2, 2, 5, 0.05)';
-                mCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+      function resize() {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
 
-                mCtx.fillStyle = '#39ff14'; // Neon green
-                mCtx.font = fontSize + 'px monospace';
+      function popParticles(targetX, targetY) {
+          const colors = ['#ff007f', '#00f0ff', '#39ff14', '#ffff00'];
+          const x = targetX || Math.random() * canvas.width;
+          const y = targetY || Math.random() * canvas.height;
+          for (let i = 0; i < 30; i++) {
+              particles.push({
+                  x: x,
+                  y: y,
+                  vx: (Math.random() - 0.5) * 8,
+                  vy: (Math.random() - 0.5) * 8 - 3,
+                  size: Math.random() * 5 + 3,
+                  color: colors[Math.floor(Math.random() * colors.length)],
+                  alpha: 1
+              });
+          }
+      }
 
-                for (let i = 0; i < rainDrops.length; i++) {
-                    const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
-                    mCtx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+      function draw() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          particles.forEach((p, i) => {
+              p.y += p.vy;
+              p.x += p.vx;
+              p.vy += 0.1; // gravity
+              ctx.globalAlpha = p.alpha;
+              ctx.fillStyle = p.color;
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+              ctx.fill();
+              p.alpha -= 0.02;
+              if (p.alpha <= 0) particles.splice(i, 1);
+          });
+          ctx.globalAlpha = 1;
+          requestAnimationFrame(draw);
+      }
+      draw();
 
-                    if (rainDrops[i] * fontSize > matrixCanvas.height && Math.random() > 0.975) {
-                        rainDrops[i] = 0;
-                    }
-                    rainDrops[i]++;
-                }
-            };
+      // --- 5. Data Science Matrix Rain Engine ---
+      const matrixCanvas = document.getElementById('matrix-canvas');
+      const mCtx = matrixCanvas.getContext('2d');
+      let matrixInterval;
 
-            matrixInterval = setInterval(drawMatrix, 30);
-            
-            // Adjust matrix canvas sizes on resize dynamically
-            window.addEventListener('resize', () => {
-                matrixCanvas.width = window.innerWidth;
-                matrixCanvas.height = window.innerHeight;
-            });
-        }
+      function startMatrixRain() {
+          document.body.style.backgroundColor = '#020205';
+          matrixCanvas.style.opacity = '0.35'; // Subtly layered in background
+
+          matrixCanvas.width = window.innerWidth;
+          matrixCanvas.height = window.innerHeight;
+
+          const alphabet = '01';
+          const fontSize = 16;
+          const columns = matrixCanvas.width / fontSize;
+
+          const rainDrops = [];
+          for (let x = 0; x < columns; x++) {
+              rainDrops[x] = 1;
+          }
+
+          const drawMatrix = () => {
+              mCtx.fillStyle = 'rgba(2, 2, 5, 0.05)';
+              mCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+
+              mCtx.fillStyle = '#39ff14'; // Neon green
+              mCtx.font = fontSize + 'px monospace';
+
+              for (let i = 0; i < rainDrops.length; i++) {
+                  const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+                  mCtx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+
+                  if (rainDrops[i] * fontSize > matrixCanvas.height && Math.random() > 0.975) {
+                      rainDrops[i] = 0;
+                  }
+                  rainDrops[i]++;
+              }
+          };
+
+          matrixInterval = setInterval(drawMatrix, 30);
+
+          // Adjust matrix canvas sizes on resize dynamically
+          window.addEventListener('resize', () => {
+              matrixCanvas.width = window.innerWidth;
+              matrixCanvas.height = window.innerHeight;
+          });
+      }
     </script>
 </body>
 </html>
